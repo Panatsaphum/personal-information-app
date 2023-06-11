@@ -26,9 +26,14 @@ class _CalendarState extends State<Calendar> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(
-          Icons.arrow_back_ios_new,
-          color: Colors.blueGrey,
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.blueGrey,
+          ),
         ),
       ),
       body: Padding(
@@ -67,7 +72,7 @@ class _CalendarState extends State<Calendar> {
               ),
               startingDayOfWeek: StartingDayOfWeek.sunday,
               calendarFormat: CalendarFormat.month,
-              focusedDay: DateTime(yearSelected ?? currentDate.year, currentDate.month, currentDate.day),
+              focusedDay: DateTime(yearSelected ?? currentDate.year, dateSelected?.month ?? currentDate.month, currentDate.day),
               firstDay: DateTime(yearSelected ?? currentDate.year, 1, 0),
               lastDay: currentDate,
               currentDay: dateSelected,

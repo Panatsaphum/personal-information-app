@@ -15,81 +15,88 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   TabController? _controller;
+  bool isLoading = true;
 
   @override
   void initState() {
     _controller = TabController(length: 2, vsync: this);
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      context.read<PersonalInformationBloc>().add(GetAddess());
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
+    return BlocListener<PersonalInformationBloc, PersonalInformationState>(
+      listener: (context, state) {
+        if (state.status == PersonalInformationStatus.loading) {
+          setState(() => isLoading = true);
+        } else {
+          setState(() => isLoading = false);
+        }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "รายชื่อผู้ลงทะเบียน",
-              style: FontTheme.medium,
+      child: WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "รายชื่อผู้ลงทะเบียน",
+                style: FontTheme.medium,
+              ),
             ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              context: context,
-              builder: (context) => AddInformationBottomSheet(),
-            );
-            Navigator.push(
-              context,
-              MaterialPageRoute(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              showModalBottomSheet(
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                context: context,
                 builder: (context) => AddInformationBottomSheet(),
-              ),
-            );
-          },
-          tooltip: "เพิ่มรายชื่อใหม่",
-          child: Icon(Icons.add),
-        ),
-        body: SafeArea(
-          child: Container(
-            color: Colors.blue.shade50,
-            child: Column(
-              children: [
-                TabBar(
-                  indicatorColor: Colors.grey,
-                  controller: _controller,
-                  tabs: [
-                    Tab(
-                      child: Text(
-                        "ทั้งหมด",
-                        style: FontTheme.regular,
+              );
+            },
+            tooltip: "เพิ่มรายชื่อใหม่",
+            child: Icon(Icons.add),
+          ),
+          body: SafeArea(
+            child: Container(
+              color: Colors.blue.shade50,
+              child: Column(
+                children: [
+                  TabBar(
+                    indicatorColor: Colors.grey,
+                    controller: _controller,
+                    tabs: [
+                      Tab(
+                        child: Text(
+                          "ทั้งหมด",
+                          style: FontTheme.regular,
+                        ),
+                      ),
+                      Tab(
+                        child: Text("จังหวัด", style: FontTheme.regular),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Colors.white,
+                      child: TabBarView(
+                        controller: _controller,
+                        children: [
+                          ShowAllInformation(),
+                          ShowByProvince(),
+                        ],
                       ),
                     ),
-                    Tab(
-                      child: Text("จังหวัด", style: FontTheme.regular),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Container(
-                    color: Colors.lightGreen,
-                    child: TabBarView(
-                      controller: _controller,
-                      children: [
-                        ShowAllInformation(),
-                        ShowByProvince(),
-                      ],
-                    ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),
